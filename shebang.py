@@ -56,6 +56,7 @@ def main():
             bound_lower = length_test
             if length_test > 1000000:
                 print('Maximum shebang length > 1MB, not testing further')
+                return
             length_test *= 2
         else:
             bound_upper = length_test
@@ -68,6 +69,7 @@ def main():
         else:
             bound_upper = length_test
 
+    print('Maximum shebang length (including newline)')
     print(bound_lower)
 
 
