@@ -52,10 +52,10 @@ def main():
 
     # Find upper bound
     while bound_upper is None:
-        if length_test > 1000000:
-            raise Exception('Not testing shebang above 1m characters')
         if shebang_works(length_test):
             bound_lower = length_test
+            if length_test > 1000000:
+                raise Exception('Maximum shebang length > 1MB, not testing further')
             length_test *= 2
         else:
             bound_upper = length_test
