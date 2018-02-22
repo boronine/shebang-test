@@ -55,7 +55,7 @@ def main():
         if shebang_works(length_test):
             bound_lower = length_test
             if length_test > 1000000:
-                raise Exception('Maximum shebang length > 1MB, not testing further')
+                print('Maximum shebang length > 1MB, not testing further')
             length_test *= 2
         else:
             bound_upper = length_test
