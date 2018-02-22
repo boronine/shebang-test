@@ -2,11 +2,13 @@
 """Prints the maximum length of the shebang, including the newline
 """
 import os
+import sys
 import stat
 import subprocess
 
-shebang_prefix = '#!/usr/bin/env '
-shebang_suffix = 'python\n'
+# We are going to change the length of shebang by adding a number of -R flags to Python
+shebang_prefix = '#!' + sys.executable + ' -R'
+shebang_suffix = '\n'
 shebang_length_min = len(shebang_prefix) + len(shebang_suffix)
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +18,7 @@ TEST_FILE_PATH = os.path.join(ROOT, 'shebang_test_delete_me.py')
 def executable(shebang_length):
     assert shebang_length >= shebang_length_min
     num_extra_chars = shebang_length - shebang_length_min
-    extra_chars = ' ' * num_extra_chars
+    extra_chars = 'R' * num_extra_chars
     shebang = shebang_prefix + extra_chars + shebang_suffix
     return shebang + 'import sys; sys.exit(7)\n'
 
@@ -30,29 +32,28 @@ def shebang_works(shebang_length):
     try:
         # Raises OSError
         proc = subprocess.Popen([TEST_FILE_PATH])
-        returncode = proc.wait()
-        # Supposed to exit 7
-        works = (returncode == 7)
-
     except OSError as err:
         if err.args == (8, 'Exec format error'):
             # This OSError means shebang is bad
-            works = False
+            return False
         else:
             # Not sure what this one means
             raise err
 
-    os.remove(TEST_FILE_PATH)
-    return works
+    returncode = proc.wait()
+    # Supposed to exit 7
+    return returncode == 7
 
 
 def main():
     # shebang works when (<=) bound_lower and does not work when (>=) bound_upper
-    bound_lower = length_test = 32
+    bound_lower = length_test = shebang_length_min
     bound_upper = None
 
     # Find upper bound
     while bound_upper is None:
+        if length_test > 1000000:
+            raise Exception('Not testing shebang above 1m characters')
         if shebang_works(length_test):
             bound_lower = length_test
             length_test *= 2

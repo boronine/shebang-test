@@ -1,0 +1,3 @@
+__pycache__/
+*.py[cod]
+/shebang_test_delete_me.py
